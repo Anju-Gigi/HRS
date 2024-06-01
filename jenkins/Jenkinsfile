@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         AWS_REGION = 'eu-north-1'  
-        ECR_REPO_URI = 'your-account-id.dkr.ecr.us-east-1.amazonaws.com/your-ecr-repository'
+        ECR_REPO_URI = '627562689753.dkr.ecr.eu-north-1.amazonaws.com'
         ECS_CLUSTER = 'my-cluster'
         ECS_SERVICE = 'my-service'
         DOCKER_IMAGE = "627562689753.dkr.ecr.eu-north-1.amazonaws.com/java:latest"
