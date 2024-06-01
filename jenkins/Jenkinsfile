@@ -1,30 +1,75 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.9.0'
-            args '-v /root/.m2:/root/.m2'
-        }
+    agent any
+
+    environment {
+        AWS_REGION = 'eu-north-1'  
+        ECR_REPO_URI = 'your-account-id.dkr.ecr.us-east-1.amazonaws.com/your-ecr-repository'
+        ECS_CLUSTER = 'my-cluster'
+        ECS_SERVICE = 'my-service'
+        DOCKER_IMAGE = "627562689753.dkr.ecr.eu-north-1.amazonaws.com/java:latest"
+        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
     }
+
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                sh 'mvn -B -DskipTests clean package'
+                checkout scm
             }
         }
-        stage('Test') {
+
+        stage('Build WAR') {
             steps {
-                sh 'mvn test'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
+                script {
+                    sh 'mvn clean package'
                 }
             }
         }
-        stage('Deliver') {
+
+        stage('Build Docker Image') {
             steps {
-                sh './jenkins/scripts/deliver.sh'
+                script {
+                    sh """
+                    docker build -t ${DOCKER_IMAGE} .
+                    """
+                }
             }
+        }
+
+        stage('Login to Amazon ECR') {
+            steps {
+                script {
+                    sh """
+                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO_URI}
+                    """
+                }
+            }
+        }
+
+        stage('Push Docker Image to ECR') {
+            steps {
+                script {
+                    sh """
+                    docker push ${DOCKER_IMAGE}
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to ECS') {
+            steps {
+                script {
+                    sh """
+                    aws ecs update-service --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --force-new-deployment
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
         }
     }
 }
