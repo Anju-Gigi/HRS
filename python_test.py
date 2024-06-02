@@ -13,7 +13,7 @@ REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', None)
 
 S3_BUCKET = os.getenv('S3_BUCKET')
-S3_REGION = os.getenv('S3_REGION', 'us-east-1')
+S3_REGION = os.getenv('S3_REGION', 'eu-north-1')
 
 # Connect to Redis
 redis_client = redis.StrictRedis(
