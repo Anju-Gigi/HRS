@@ -5,7 +5,7 @@ pipeline {
         AWS_REGION = 'eu-north-1'  
         ECR_REPO_URI = '627562689753.dkr.ecr.eu-north-1.amazonaws.com'
         ECS_CLUSTER = 'my-cluster'
-        ECS_SERVICE = 'my-service'
+        ECS_SERVICE = 'app-service'
         DOCKER_IMAGE = "627562689753.dkr.ecr.eu-north-1.amazonaws.com/java:latest"
         AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
